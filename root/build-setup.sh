@@ -21,7 +21,8 @@ a2enmod xsendfile
 if [ "$DOKUWIKI_VERSION" = "master" ]; then
     curl --fail --retry 5 --retry-all-errors -L "https://github.com/dokuwiki/dokuwiki/archive/refs/heads/master.tar.gz" -o dokuwiki.tgz
 else
-    curl --fail --retry 5 --retry-all-errors -L "https://download.dokuwiki.org/src/dokuwiki/dokuwiki-${DOKUWIKI_VERSION}.tgz" -o dokuwiki.tgz
+    curl --fail --retry 3 --retry-all-errors -L "https://download.dokuwiki.org/src/dokuwiki/dokuwiki-${DOKUWIKI_VERSION}.tgz" -o dokuwiki.tgz \
+        || curl --fail --retry 5 --retry-all-errors -L "https://github.com/dokuwiki/dokuwiki/archive/refs/tags/release-${DOKUWIKI_VERSION}.tar.gz" -o dokuwiki.tgz  # fallback if dokuwiki server is not reachable
 fi
 
 # Extract DokuWiki to the web root

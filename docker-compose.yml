@@ -19,6 +19,24 @@ services:
       - default
       - proxy
 
+  dokuwiki-test:
+    build:
+      context: .
+      args:
+        DOKUWIKI_VERSION: ${DOKUWIKI_TAG:-stable}
+    image: dokuwiki/build:${DOKUWIKI_TAG:-stable}
+    user: "107:116"
+    restart: unless-stopped
+    environment:
+      PHP_TIMEZONE: Europe/Berlin
+      #PHP_MEMORYLIMIT: 256M
+      #PHP_UPLOADLIMIT: 128M
+    volumes:
+      - ./test-storage:/storage
+    networks:
+      - default
+      - proxy
+
 networks:
   proxy:
     external: true

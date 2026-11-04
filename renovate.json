@@ -42,7 +42,7 @@
       ]
     },
     {
-      "description": "PHP base image: separate PR per PHP minor version, never automerge",
+      "description": "PHP base image: version changes (e.g. 8.5 -> 8.6) get a PR",
       "matchDatasources": [
         "docker"
       ],
@@ -52,8 +52,35 @@
       "labels": [
         "dependencies",
         "php"
+      ]
+    },
+    {
+      "description": "PHP base image: automerge digest-only updates of the same tag (e.g. rebuilt 8.5-apache)",
+      "matchDatasources": [
+        "docker"
       ],
-      "automerge": false
+      "matchPackageNames": [
+        "php"
+      ],
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest",
+        "digest"
+      ],
+      "automerge": true,
+      "automergeType": "branch"
+    },
+    {
+      "description": "DokuWiki: automerge hotfixes of the current release (2026-07-14b -> 2026-07-14c); new releases get a PR",
+      "matchDepNames": [
+        "dokuwiki/dokuwiki"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchNewValue": "/^\\d{4}-\\d{2}-\\d{2}[a-z]$/",
+      "automerge": true,
+      "automergeType": "branch"
     }
   ]
 }

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "timezone": "Europe/Berlin",
+  "labels": [
+    "dependencies"
+  ],
+  "ignorePaths": [
+    ".github/workflows/docker.yml"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "DokuWiki release pinned in .env (also written by bin/dc_build.sh)",
+      "managerFilePatterns": [
+        "/^\\.env$/"
+      ],
+      "matchStrings": [
+        "DOKUWIKI_TAG=(?<currentValue>\\d{4}-\\d{2}-\\d{2}[a-z]?)\\s"
+      ],
+      "depNameTemplate": "dokuwiki/dokuwiki",
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "loose",
+      "extractVersionTemplate": "^release-(?<version>\\d{4}-\\d{2}-\\d{2}[a-z]?)$"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "DokuWiki core updates",
+      "matchDepNames": [
+        "dokuwiki/dokuwiki"
+      ],
+      "commitMessageTopic": "DokuWiki",
+      "labels": [
+        "dependencies",
+        "dokuwiki"
+      ]
+    },
+    {
+      "description": "PHP base image: separate PR per PHP minor version, never automerge",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "php"
+      ],
+      "labels": [
+        "dependencies",
+        "php"
+      ],
+      "automerge": false
+    }
+  ]
+}

@@ -1,41 +1,30 @@
+# JDAV Hessen deployment. Takes precedence over upstream's example docker-compose.yml,
+# which is kept unchanged to ease merges from dokuwiki/docker.
+# The image tag and digest are maintained by Renovate (see renovate.json).
 name: dokuwiki
+
+x-dokuwiki: &dokuwiki
+  image: dokuwiki/dokuwiki:2026-07-14c@sha256:cdff2da12458b91ad7bb2bd14a1b45c451f1a112891d7a29b5f63b6c160bc8c2
+  user: "107:116"
+  restart: unless-stopped
+  environment:
+    PHP_TIMEZONE: Europe/Berlin
+    #PHP_MEMORYLIMIT: 256M
+    #PHP_UPLOADLIMIT: 128M
+  networks:
+    - default
+    - proxy
 
 services:
   dokuwiki:
-    build:
-      context: .
-      args:
-        DOKUWIKI_VERSION: ${DOKUWIKI_TAG:-stable}
-    image: dokuwiki/build:${DOKUWIKI_TAG:-stable}
-    user: "107:116"
-    restart: unless-stopped
-    environment:
-      PHP_TIMEZONE: Europe/Berlin
-      #PHP_MEMORYLIMIT: 256M
-      #PHP_UPLOADLIMIT: 128M
+    <<: *dokuwiki
     volumes:
       - ./storage:/storage
-    networks:
-      - default
-      - proxy
 
   dokuwiki-test:
-    build:
-      context: .
-      args:
-        DOKUWIKI_VERSION: ${DOKUWIKI_TAG:-stable}
-    image: dokuwiki/build:${DOKUWIKI_TAG:-stable}
-    user: "107:116"
-    restart: unless-stopped
-    environment:
-      PHP_TIMEZONE: Europe/Berlin
-      #PHP_MEMORYLIMIT: 256M
-      #PHP_UPLOADLIMIT: 128M
+    <<: *dokuwiki
     volumes:
       - ./test-storage:/storage
-    networks:
-      - default
-      - proxy
 
 networks:
   proxy:

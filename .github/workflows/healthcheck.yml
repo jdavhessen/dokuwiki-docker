@@ -1,0 +1,53 @@
+# Starts the stack from docker-compose.yml and waits for the image's healthcheck.
+# Serves as the status check Renovate needs before it automerges an update
+# (branch automerge reports on the pushed commit, hence the push trigger).
+name: Healthcheck
+
+on:
+  push:
+    branches: ["renovate/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: healthcheck-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  healthcheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare external network and storage
+        run: |
+          docker network create proxy
+          # same uid:gid as the "user:" setting in docker-compose.yml
+          sudo install -d -o 107 -g 116 storage test-storage
+
+      - name: Start stack and wait until healthy
+        run: docker compose up --detach --wait --wait-timeout 180
+
+      - name: Request the start page
+        run: |
+          for service in dokuwiki dokuwiki-test; do
+            docker compose exec -T "$service" \
+              curl --silent --show-error --fail --output /dev/null http://localhost:8080/doku.php
+          done
+
+      - name: Show logs
+        if: failure()
+        run: |
+          docker compose ps --all
+          docker compose logs
+
+      - name: Stop stack
+        if: always()
+        run: docker compose down --volumes

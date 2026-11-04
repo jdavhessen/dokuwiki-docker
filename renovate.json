@@ -10,7 +10,11 @@
     "dependencies"
   ],
   "enabledManagers": [
-    "docker-compose"
+    "docker-compose",
+    "github-actions"
+  ],
+  "ignorePaths": [
+    ".github/workflows/docker.yml"
   ],
   "packageRules": [
     {
